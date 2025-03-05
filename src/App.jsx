@@ -1,24 +1,7 @@
 import React, { useState, useEffect, useRef, useMemo } from 'react';
 import { 
-  TrendingUp, 
   Search, 
-  Menu, 
-  Bell, 
-  Home, 
-  Compass, 
-  Bookmark, 
-  Settings, 
-  ThumbsUp, 
-  MessageSquare, 
-  Share2, 
-  Filter, 
-  Moon,
-  Sun, 
-  X,
-  ArrowUp,
-  ArrowDown,
-  Clock,
-  Keyboard
+  Clock
 } from 'lucide-react';
 import { Header } from './components/layout/Header';
 import { Sidebar } from './components/layout/Sidebar';
@@ -80,6 +63,8 @@ const TrendPulseApp = () => {
   }, [darkMode]);
 
   // Função para alternar o modo escuro
+  // Mantida para uso futuro na interface
+  /* eslint-disable-next-line no-unused-vars */
   const toggleDarkMode = () => {
     setDarkMode(prevMode => !prevMode);
   };
@@ -128,15 +113,15 @@ const TrendPulseApp = () => {
   }, [trends]);
   
   // Tags populares predefinidas
-  const popularTags = [
+  const popularTags = useMemo(() => [
     'tecnologia', 'IA', 'filmes', 'esports', 'trabalhoremoto', 
     'sustentabilidade', 'investimentos', 'medicina', 'ciência'
-  ];
+  ], []);
 
   // Aplicar filtros quando a categoria, plataforma ou pesquisa mudar
   useEffect(() => {
     filterTrends();
-  }, [activeTab, selectedPlatform, searchQuery]);
+  }, [activeTab, selectedPlatform, searchQuery, filterTrends]);
 
   // Salvar histórico de pesquisa no localStorage quando mudar
   useEffect(() => {
@@ -304,6 +289,8 @@ const TrendPulseApp = () => {
   };
 
   // Função para limpar a pesquisa
+  // Mantida para uso futuro na interface
+  /* eslint-disable-next-line no-unused-vars */
   const clearSearch = () => {
     setSearchQuery('');
     if (searchInputRef.current) {
@@ -364,17 +351,20 @@ const TrendPulseApp = () => {
   };
   
   // Função para lidar com o mouse sobre as sugestões
+  /* eslint-disable-next-line no-unused-vars */
   const handleSuggestionHover = (index) => {
     setActiveSuggestionIndex(index);
     setKeyboardNavActive(false);
   };
 
   // Função para limpar o histórico de pesquisa
+  /* eslint-disable-next-line no-unused-vars */
   const clearSearchHistory = () => {
     setSearchHistory([]);
   };
 
   // Componente para ícones de plataforma
+  /* eslint-disable-next-line no-unused-vars */
   const PlatformIcon = ({ platform }) => {
     switch(platform) {
       case 'youtube':
@@ -401,6 +391,7 @@ const TrendPulseApp = () => {
   };
   
   // Função para exibir o tipo de ícone da sugestão
+  /* eslint-disable-next-line no-unused-vars */
   const getSuggestionIcon = (type) => {
     switch(type) {
       case 'history':
@@ -475,6 +466,7 @@ const TrendPulseApp = () => {
 };
 
 // Componente para destacar texto que corresponde à consulta de pesquisa
+/* eslint-disable-next-line no-unused-vars */
 const HighlightText = ({ text, query }) => {
   if (!query || query.trim() === '') return text;
   

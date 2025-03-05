@@ -1,5 +1,5 @@
 import React, { useState, useRef, useEffect } from 'react';
-import { ThumbsUp, MessageSquare, Share2, Bookmark, ChevronDown, ChevronUp, ExternalLink, Link, Play } from 'lucide-react';
+import { ThumbsUp, MessageSquare, Share2, Bookmark, ChevronDown, ChevronUp, ExternalLink, Link } from 'lucide-react';
 import { PlatformIcon } from '../../common/PlatformIcon';
 import { HighlightText } from '../../common/HighlightText';
 import './styles.css';
@@ -13,9 +13,7 @@ export function TrendCard({
 }) {
   const [isExpanded, setIsExpanded] = useState(false);
   const [showReadMore, setShowReadMore] = useState(false);
-  const [isVideoPlaying, setIsVideoPlaying] = useState(false);
   const descriptionRef = useRef(null);
-  const videoRef = useRef(null);
 
   const {
     id,
@@ -31,12 +29,6 @@ export function TrendCard({
     url,
     thumbnail
   } = trend;
-
-  // Função para determinar se é vídeo do Reddit
-  const isRedditVideo = (description) => {
-    const videoMatch = description.match(/Vídeo:\s*(.*?)(?=Prévia:|$)/s);
-    return videoMatch && videoMatch[1].includes('v.redd.it');
-  };
 
   // Função para extrair URLs da descrição
   const extractUrls = (description) => {
@@ -128,13 +120,6 @@ export function TrendCard({
       setShowReadMore(lines > 3);
     }
   }, [description]);
-
-  // Limpar o estado do vídeo quando o card for desmontado
-  useEffect(() => {
-    return () => {
-      setIsVideoPlaying(false);
-    };
-  }, []);
 
   // Função para abrir o link em uma nova aba
   const handleCardClick = (e) => {
