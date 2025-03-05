@@ -60,6 +60,9 @@ const TrendPulseApp = () => {
   const [currentPage, setCurrentPage] = useState(1);
   const [itemsPerPage, setItemsPerPage] = useState(9);
   
+  // Referência para o container de tendências
+  const [cardsPerRow, setCardsPerRow] = useState(3); // Valor padrão
+  
   // Efeito para aplicar ou remover a classe 'dark' no HTML
   useEffect(() => {
     if (darkMode) {
@@ -502,6 +505,32 @@ const TrendPulseApp = () => {
       window.open(trend.url, '_blank', 'noopener,noreferrer');
     }
   };
+
+  // Detectar quantos cards cabem por linha
+  useEffect(() => {
+    const detectCardsPerRow = () => {
+      if (trendsRef.current) {
+        const containerWidth = trendsRef.current.offsetWidth;
+        const cardWidth = 300; // Largura mínima de um card + gap
+        const gap = 24; // Valor do gap (var(--spacing-6))
+        const calculatedCards = Math.floor(containerWidth / (cardWidth + gap));
+        setCardsPerRow(Math.max(1, calculatedCards));
+        
+        // Ajustar itemsPerPage para ser múltiplo de cardsPerRow
+        const newItemsPerPage = calculatedCards * 3; // 3 linhas por padrão
+        setItemsPerPage(newItemsPerPage);
+      }
+    };
+    
+    detectCardsPerRow();
+    
+    // Adicionar listener para redimensionamento
+    window.addEventListener('resize', detectCardsPerRow);
+    
+    return () => {
+      window.removeEventListener('resize', detectCardsPerRow);
+    };
+  }, []);
 
   return (
     <div className="app">
