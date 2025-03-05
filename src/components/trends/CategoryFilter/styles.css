@@ -1,0 +1,58 @@
+.category-filter {
+  overflow-x: auto;
+  padding-bottom: var(--spacing-2);
+  margin-bottom: var(--spacing-6);
+}
+
+.category-list {
+  display: flex;
+  gap: var(--spacing-2);
+}
+
+.category-button {
+  padding: var(--spacing-2) var(--spacing-4);
+  border-radius: var(--radius-full);
+  background-color: var(--color-white);
+  border: 1px solid var(--color-gray-300);
+  color: var(--color-gray-700);
+  font-size: var(--font-size-sm);
+  white-space: nowrap;
+  transition: all var(--transition-base) var(--ease-in-out);
+}
+
+.dark .category-button {
+  background-color: var(--color-gray-800);
+  border-color: var(--color-gray-700);
+  color: var(--color-gray-300);
+}
+
+.category-button:hover {
+  background-color: var(--color-gray-100);
+  border-color: var(--color-gray-400);
+}
+
+.dark .category-button:hover {
+  background-color: var(--color-gray-700);
+  border-color: var(--color-gray-600);
+}
+
+.category-button.active {
+  background-color: var(--color-purple-600);
+  border-color: var(--color-purple-600);
+  color: var(--color-white);
+}
+
+.dark .category-button.active {
+  background-color: var(--color-purple-600);
+  border-color: var(--color-purple-500);
+}
+
+/* Esconder scrollbar mas manter funcionalidade */
+.category-filter::-webkit-scrollbar {
+  display: none;
+}
+
+.category-filter {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+} 

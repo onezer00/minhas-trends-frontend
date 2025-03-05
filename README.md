@@ -61,6 +61,17 @@ This section has moved here: [https://facebook.github.io/create-react-app/docs/m
 
 This section has moved here: [https://facebook.github.io/create-react-app/docs/advanced-configuration](https://facebook.github.io/create-react-app/docs/advanced-configuration)
 
+### Configuração de Ambiente
+
+O projeto utiliza detecção automática de ambiente para configurar a URL da API:
+
+- **Desenvolvimento**: Quando executado localmente, a aplicação usa automaticamente a URL `http://localhost:8000/api`
+- **Produção**: Quando hospedado no GitHub Pages (onezer00.github.io), a aplicação usa automaticamente a URL `https://trendpulse-api.onrender.com/api`
+
+A detecção é feita no arquivo `src/services/api.js` com base no hostname e na variável de ambiente `NODE_ENV`.
+
+Esta abordagem elimina a necessidade de arquivos `.env` e `.env.production`, tornando a configuração mais segura e fácil de manter.
+
 ### Deployment
 
 This section has moved here: [https://facebook.github.io/create-react-app/docs/deployment](https://facebook.github.io/create-react-app/docs/deployment)

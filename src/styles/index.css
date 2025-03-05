@@ -1,0 +1,17 @@
+/* Importando variáveis e estilos base */
+@import './variables.css';
+
+/* Importando estilos dos componentes de layout */
+@import '../components/layout/Header/styles.css';
+@import '../components/layout/Sidebar/styles.css';
+
+/* Importando estilos dos componentes de tendências */
+@import '../components/trends/CategoryFilter/styles.css';
+@import '../components/trends/TrendCard/styles.css';
+
+/* Importando estilos dos componentes comuns */
+@import '../components/common/PlatformIcon/styles.css';
+@import '../components/common/HighlightText/styles.css';
+
+/* Importando estilos da aplicação */
+@import '../App.css'; 

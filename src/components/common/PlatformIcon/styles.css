@@ -1,0 +1,55 @@
+.platform-icon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: var(--radius-full);
+  font-weight: 700;
+  color: var(--color-white);
+  transition: all var(--transition-base) var(--ease-in-out);
+}
+
+/* Tamanhos */
+.platform-icon.sm {
+  width: var(--spacing-4);
+  height: var(--spacing-4);
+  font-size: var(--font-size-xs);
+}
+
+.platform-icon.md {
+  width: var(--spacing-5);
+  height: var(--spacing-5);
+  font-size: var(--font-size-sm);
+}
+
+.platform-icon.lg {
+  width: var(--spacing-6);
+  height: var(--spacing-6);
+  font-size: var(--font-size-base);
+}
+
+/* Cores por plataforma */
+.platform-icon.youtube {
+  background-color: var(--color-youtube);
+}
+
+.platform-icon.twitter {
+  background-color: var(--color-twitter);
+}
+
+.platform-icon.reddit {
+  background-color: var(--color-reddit);
+}
+
+.platform-icon.default {
+  background-color: var(--color-gray-400);
+}
+
+/* Efeito hover */
+.platform-icon:hover {
+  transform: scale(1.1);
+}
+
+/* Efeito de brilho no modo escuro */
+.dark .platform-icon {
+  box-shadow: 0 0 8px rgba(255, 255, 255, 0.1);
+} 

@@ -1,0 +1,91 @@
+.search-bar-container {
+  position: relative;
+  width: 100%;
+}
+
+.search-form {
+  position: relative;
+  width: 100%;
+}
+
+.search-input {
+  width: 100%;
+  padding: 0.5rem 2.5rem;
+  border-radius: 9999px;
+  border: 1px solid var(--color-gray-300);
+  background-color: var(--color-white);
+  transition: all 0.3s ease;
+}
+
+.dark .search-input {
+  border-color: var(--color-gray-700);
+  background-color: var(--color-gray-700);
+  color: var(--color-white);
+}
+
+.search-input:focus {
+  outline: none;
+  border-color: var(--color-purple-500);
+  box-shadow: 0 0 0 2px rgba(147, 51, 234, 0.2);
+}
+
+.dark .search-input:focus {
+  border-color: var(--color-purple-400);
+  box-shadow: 0 0 0 2px rgba(147, 51, 234, 0.3);
+}
+
+.search-icon {
+  position: absolute;
+  left: 0.75rem;
+  top: 50%;
+  transform: translateY(-50%);
+  color: var(--color-gray-400);
+  transition: color 0.3s ease;
+}
+
+.search-icon.active {
+  color: var(--color-purple-500);
+}
+
+.dark .search-icon.active {
+  color: var(--color-purple-400);
+}
+
+.clear-button {
+  position: absolute;
+  right: 0.75rem;
+  top: 50%;
+  transform: translateY(-50%);
+  background: none;
+  border: none;
+  padding: 0.25rem;
+  color: var(--color-gray-400);
+  cursor: pointer;
+  transition: all 0.3s ease;
+  border-radius: 50%;
+}
+
+.clear-button:hover {
+  color: var(--color-gray-600);
+  background-color: var(--color-gray-100);
+}
+
+.dark .clear-button:hover {
+  color: var(--color-gray-200);
+  background-color: var(--color-gray-600);
+}
+
+/* Animação do placeholder */
+@keyframes typing {
+  from { width: 0 }
+  to { width: 100% }
+}
+
+.search-input::placeholder {
+  overflow: hidden;
+  white-space: nowrap;
+}
+
+.search-input:focus::placeholder {
+  animation: typing 1.5s steps(30, end);
+} 
