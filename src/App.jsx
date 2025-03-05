@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef, useMemo } from 'react';
+import React, { useState, useEffect, useRef, useMemo, useCallback } from 'react';
 import { 
   Search, 
   Clock
@@ -118,10 +118,61 @@ const TrendPulseApp = () => {
     'sustentabilidade', 'investimentos', 'medicina', 'ciência'
   ], []);
 
+  // Função para filtrar as tendências com animação
+  const filterTrends = useCallback(() => {
+    // Inicia a animação
+    setIsAnimating(true);
+    
+    // Se temos uma referência para o elemento da lista
+    if (trendsRef.current) {
+      trendsRef.current.style.opacity = '0';
+      trendsRef.current.style.transform = 'translateY(20px)';
+    }
+    
+    // Pequeno atraso para a animação ser perceptível
+    setTimeout(() => {
+      let filtered = [...trends];
+      
+      // Filtrar por categoria
+      if (activeTab !== 'all') {
+        filtered = filtered.filter(trend => trend.category === activeTab);
+      }
+      
+      // Filtrar por plataforma
+      if (selectedPlatform !== 'all') {
+        filtered = filtered.filter(trend => trend.platform === selectedPlatform);
+      }
+      
+      // Filtrar por pesquisa
+      if (searchQuery) {
+        const query = searchQuery.toLowerCase();
+        filtered = filtered.filter(trend => 
+          trend.title.toLowerCase().includes(query) || 
+          trend.description.toLowerCase().includes(query) ||
+          trend.tags.some(tag => tag.toLowerCase().includes(query)) ||
+          trend.author.toLowerCase().includes(query) ||
+          trend.platform.toLowerCase().includes(query) ||
+          trend.category.toLowerCase().includes(query)
+        );
+      }
+      
+      setFilteredTrends(filtered);
+      
+      // Restaura a opacidade após um pequeno atraso
+      setTimeout(() => {
+        if (trendsRef.current) {
+          trendsRef.current.style.opacity = '1';
+          trendsRef.current.style.transform = 'translateY(0)';
+        }
+        setIsAnimating(false);
+      }, 50);
+    }, 200);
+  }, [activeTab, selectedPlatform, searchQuery, trends]);
+
   // Aplicar filtros quando a categoria, plataforma ou pesquisa mudar
   useEffect(() => {
     filterTrends();
-  }, [activeTab, selectedPlatform, searchQuery, filterTrends]);
+  }, [filterTrends]);
 
   // Salvar histórico de pesquisa no localStorage quando mudar
   useEffect(() => {
@@ -212,58 +263,6 @@ const TrendPulseApp = () => {
       document.removeEventListener('mousedown', handleClickOutside);
     };
   }, []);
-
-  // Função para filtrar as tendências com animação
-  const filterTrends = () => {
-    // Inicia a animação
-    setIsAnimating(true);
-    
-    // Se temos uma referência para o elemento da lista
-    if (trendsRef.current) {
-      trendsRef.current.style.opacity = '0';
-      trendsRef.current.style.transform = 'translateY(20px)';
-    }
-    
-    // Pequeno atraso para a animação ser perceptível
-    setTimeout(() => {
-      let filtered = [...trends];
-      
-      // Filtrar por categoria
-      if (activeTab !== 'all') {
-        filtered = filtered.filter(trend => trend.category === activeTab);
-      }
-      
-      // Filtrar por plataforma
-      if (selectedPlatform !== 'all') {
-        filtered = filtered.filter(trend => trend.platform === selectedPlatform);
-      }
-      
-      // Filtrar por pesquisa
-      if (searchQuery.trim() !== '') {
-        const query = searchQuery.toLowerCase();
-        filtered = filtered.filter(trend => 
-          trend.title.toLowerCase().includes(query) || 
-          trend.description.toLowerCase().includes(query) || 
-          trend.author.toLowerCase().includes(query) || 
-          trend.tags.some(tag => tag.toLowerCase().includes(query))
-        );
-      }
-      
-      setFilteredTrends(filtered);
-      
-      // Termina a animação após um curto atraso
-      setTimeout(() => {
-        if (trendsRef.current) {
-          trendsRef.current.style.opacity = '1';
-          trendsRef.current.style.transform = 'translateY(0)';
-        }
-        
-        setTimeout(() => {
-          setIsAnimating(false);
-        }, 300);
-      }, 50);
-    }, 200);
-  };
 
   // Função para lidar com a pesquisa
   const handleSearch = (e) => {
