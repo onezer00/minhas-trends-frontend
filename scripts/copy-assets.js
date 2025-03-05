@@ -23,7 +23,8 @@ function copyFile(source, target) {
 const files = [
   { src: 'src/assets/logo.svg', dest: 'public/logo.svg' },
   { src: 'src/assets/logo192.png', dest: 'public/logo192.png' },
-  { src: 'src/assets/logo512.png', dest: 'public/logo512.png' }
+  { src: 'src/assets/logo512.png', dest: 'public/logo512.png' },
+  { src: 'src/assets/favicon.svg', dest: 'public/favicon.svg' }
 ];
 
 // Copiar cada arquivo
