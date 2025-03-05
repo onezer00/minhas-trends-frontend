@@ -3,8 +3,14 @@ import axios from 'axios';
 // Determina a URL da API com base no ambiente
 const getApiUrl = () => {
   // Verifica se estamos em produção (GitHub Pages)
-  const isProduction = window.location.hostname === 'onezer00.github.io' || 
+  const hostname = window.location.hostname;
+  const isProduction = hostname === 'onezer00.github.io' || 
+                       hostname.includes('github.io') ||
                        process.env.NODE_ENV === 'production';
+  
+  // Log para debug
+  console.log('Hostname:', hostname);
+  console.log('É produção?', isProduction);
   
   // URL da API em produção
   if (isProduction) {
