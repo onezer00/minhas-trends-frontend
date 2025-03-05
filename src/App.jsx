@@ -15,7 +15,8 @@ const TrendPulseApp = () => {
   const [showMobileMenu, setShowMobileMenu] = useState(false);
   const [selectedPlatform, setSelectedPlatform] = useState('all');
   const [filteredTrends, setFilteredTrends] = useState([]);
-  const [_isAnimating, setIsAnimating] = useState(false);
+  // eslint-disable-next-line no-unused-vars
+  const [isAnimating, setIsAnimating] = useState(false);
   const [searchQuery, setSearchQuery] = useState('');
   const [isSearching, setIsSearching] = useState(false);
   const [suggestions, setSuggestions] = useState([]);
@@ -24,8 +25,10 @@ const TrendPulseApp = () => {
   const [trends, setTrends] = useState([]);
   
   // Novo estado para categorias
-  const [_categories, setCategories] = useState([]);
-  const [_loadingCategories, setLoadingCategories] = useState(false);
+  // eslint-disable-next-line no-unused-vars
+  const [categories, setCategories] = useState([]);
+  // eslint-disable-next-line no-unused-vars
+  const [loadingCategories, setLoadingCategories] = useState(false);
   
   // Estado para controlar a navegação por teclado
   const [activeSuggestionIndex, setActiveSuggestionIndex] = useState(-1);
