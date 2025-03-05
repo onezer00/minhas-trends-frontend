@@ -5,9 +5,8 @@ import {
 } from 'lucide-react';
 import { Header } from './components/layout/Header';
 import { Sidebar } from './components/layout/Sidebar';
-import { CategoryFilter } from './components/trends/CategoryFilter';
 import { TrendCard } from './components/trends/TrendCard';
-import { ThemeProvider } from './contexts/ThemeContext';
+import { Pagination } from './components/common/Pagination';
 import api from './services/api';
 
 const TrendPulseApp = () => {
@@ -23,6 +22,10 @@ const TrendPulseApp = () => {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
   const [trends, setTrends] = useState([]);
+  
+  // Novo estado para categorias
+  const [categories, setCategories] = useState([]);
+  const [loadingCategories, setLoadingCategories] = useState(false);
   
   // Estado para controlar a navegação por teclado
   const [activeSuggestionIndex, setActiveSuggestionIndex] = useState(-1);
@@ -50,6 +53,10 @@ const TrendPulseApp = () => {
   const suggestionsRef = useRef(null);
   const suggestionsListRef = useRef(null);
   
+  // Estados para paginação
+  const [currentPage, setCurrentPage] = useState(1);
+  const [itemsPerPage, setItemsPerPage] = useState(9);
+  
   // Efeito para aplicar ou remover a classe 'dark' no HTML
   useEffect(() => {
     if (darkMode) {
@@ -63,8 +70,6 @@ const TrendPulseApp = () => {
   }, [darkMode]);
 
   // Função para alternar o modo escuro
-  // Mantida para uso futuro na interface
-  /* eslint-disable-next-line no-unused-vars */
   const toggleDarkMode = () => {
     setDarkMode(prevMode => !prevMode);
   };
@@ -87,6 +92,43 @@ const TrendPulseApp = () => {
     };
 
     fetchTrends();
+  }, []);
+
+  // Carregar categorias da API
+  useEffect(() => {
+    const fetchCategories = async () => {
+      try {
+        setLoadingCategories(true);
+        const response = await api.get('/categories');
+        
+        // Formatar categorias para uso nos componentes
+        const formattedCategories = [
+          { id: 'all', name: 'Tudo', count: response.data.reduce((sum, cat) => sum + cat.count, 0) },
+          ...response.data.map(cat => ({
+            id: cat.name,
+            name: cat.name.charAt(0).toUpperCase() + cat.name.slice(1),
+            count: cat.count
+          }))
+        ];
+        
+        setCategories(formattedCategories);
+      } catch (err) {
+        console.error('Erro ao buscar categorias:', err);
+        // Em caso de erro, definir categorias padrão
+        setCategories([
+          { id: 'all', name: 'Tudo' },
+          { id: 'tecnologia', name: 'Tecnologia' },
+          { id: 'entretenimento', name: 'Entretenimento' },
+          { id: 'esportes', name: 'Esportes' },
+          { id: 'ciência', name: 'Ciência' },
+          { id: 'finanças', name: 'Finanças' }
+        ]);
+      } finally {
+        setLoadingCategories(false);
+      }
+    };
+
+    fetchCategories();
   }, []);
 
   // Extrai todas as palavras-chave únicas de todos os dados para autocompletar
@@ -157,6 +199,8 @@ const TrendPulseApp = () => {
       }
       
       setFilteredTrends(filtered);
+      // Resetar para a primeira página quando os filtros mudam
+      setCurrentPage(1);
       
       // Restaura a opacidade após um pequeno atraso
       setTimeout(() => {
@@ -402,65 +446,206 @@ const TrendPulseApp = () => {
     }
   };
 
+  // Calcular tendências paginadas
+  const paginatedTrends = useMemo(() => {
+    const startIndex = (currentPage - 1) * itemsPerPage;
+    const endIndex = startIndex + itemsPerPage;
+    return filteredTrends.slice(startIndex, endIndex);
+  }, [filteredTrends, currentPage, itemsPerPage]);
+  
+  // Calcular total de páginas
+  const totalPages = useMemo(() => {
+    return Math.ceil(filteredTrends.length / itemsPerPage);
+  }, [filteredTrends, itemsPerPage]);
+  
+  // Função para lidar com a mudança de página
+  const handlePageChange = (newPage) => {
+    setCurrentPage(newPage);
+    
+    // Scroll suave para o topo da grade
+    if (trendsRef.current) {
+      trendsRef.current.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    }
+  };
+  
+  // Função para mudar itens por página
+  const handleItemsPerPageChange = (value) => {
+    setItemsPerPage(value);
+    setCurrentPage(1); // Resetar para a primeira página
+  };
+
+  // Função para mudar a categoria ativa
+  const handleTabChange = (tab) => {
+    setActiveTab(tab);
+  };
+
+  // Função para mudar a plataforma selecionada
+  const handlePlatformChange = (platform) => {
+    setSelectedPlatform(platform);
+  };
+
+  // Função para lidar com clique em tags
+  const handleTagClick = (tag) => {
+    setSearchQuery(tag);
+    // Adicionar ao histórico de pesquisa
+    if (!searchHistory.includes(tag)) {
+      setSearchHistory(prev => [tag, ...prev].slice(0, 10));
+    }
+  };
+
+  // Função para lidar com clique em tendências
+  const handleTrendClick = (trend) => {
+    if (trend.url) {
+      window.open(trend.url, '_blank', 'noopener,noreferrer');
+    }
+  };
+
   return (
-    <ThemeProvider>
-      <div className="app">
-        <Header 
-          searchQuery={searchQuery}
-          onSearchChange={handleSearch}
-          onSearch={() => {}}
-          onSearchClear={() => setSearchQuery('')}
-          onSearchFocus={() => setIsSearching(true)}
-          onSearchKeyDown={handleKeyDown}
-          onMobileMenuToggle={() => setShowMobileMenu(true)}
+    <div className="app">
+      <Header 
+        searchQuery={searchQuery}
+        onSearchChange={setSearchQuery}
+        onSearch={handleSearch}
+        onSearchClear={() => setSearchQuery('')}
+        onSearchFocus={() => setIsSearching(true)}
+        onSearchKeyDown={handleKeyDown}
+        onMobileMenuToggle={() => setShowMobileMenu(true)}
+        isMobile={window.innerWidth <= 768}
+        darkMode={darkMode}
+        onToggleDarkMode={toggleDarkMode}
+      />
+      
+      <div className="app-content">
+        <Sidebar 
+          selectedPlatform={selectedPlatform}
+          onPlatformSelect={handlePlatformChange}
+          selectedCategory={activeTab}
+          onCategorySelect={handleTabChange}
+          showMobileMenu={showMobileMenu}
+          onMobileMenuClose={() => setShowMobileMenu(false)}
           isMobile={window.innerWidth <= 768}
         />
         
-        <div className="app-content">
-          <Sidebar 
-            selectedPlatform={selectedPlatform}
-            onPlatformSelect={setSelectedPlatform}
-            showMobileMenu={showMobileMenu}
-            onMobileMenuClose={() => setShowMobileMenu(false)}
-            isMobile={window.innerWidth <= 768}
-          />
-          
-          <main className="main-content">
-            <CategoryFilter 
-              activeCategory={activeTab}
-              onCategoryChange={setActiveTab}
-            />
-            
+        <main className="main-content">
+          {isSearching && suggestions.length > 0 && (
             <div 
-              ref={trendsRef}
-              className="trends-grid"
-              style={{
-                opacity: isAnimating ? 0 : 1,
-                transform: isAnimating ? 'translateY(20px)' : 'translateY(0)',
-                transition: 'all 0.3s ease-out'
-              }}
+              className="search-suggestions" 
+              ref={suggestionsRef}
             >
-              {loading ? (
-                <div className="loading-state">Carregando tendências...</div>
-              ) : error ? (
-                <div className="error-state">{error}</div>
-              ) : (
-                filteredTrends.map((trend, index) => (
+              <div className="search-history-header">
+                <h3>Sugestões</h3>
+                {searchHistory.length > 0 && (
+                  <button 
+                    className="clear-history-btn"
+                    onClick={clearSearchHistory}
+                  >
+                    Limpar histórico
+                  </button>
+                )}
+              </div>
+              
+              <div 
+                className="max-h-60 overflow-y-auto"
+                ref={suggestionsListRef}
+              >
+                {suggestions.map((suggestion, index) => (
+                  <button
+                    key={`${suggestion.type}-${suggestion.text}`}
+                    className={`suggestion-item w-full text-left p-2 hover:bg-gray-100 dark:hover:bg-gray-700 ${index === activeSuggestionIndex ? 'active' : ''}`}
+                    onClick={() => handleSelectSuggestion(suggestion.text)}
+                    onMouseEnter={() => handleSuggestionHover(index)}
+                  >
+                    <div className="flex items-center">
+                      <span className="suggestion-icon mr-2">
+                        {getSuggestionIcon(suggestion.type)}
+                      </span>
+                      <span className="suggestion-highlight">
+                        <HighlightText text={suggestion.text} query={searchQuery} />
+                      </span>
+                    </div>
+                  </button>
+                ))}
+              </div>
+              
+              <div className="keyboard-nav-tips">
+                <div className="keyboard-arrows">
+                  <span>↑</span>
+                  <span>↓</span>
+                </div>
+                <span>para navegar</span>
+                <span className="mx-2">•</span>
+                <span>Enter</span>
+                <span>para selecionar</span>
+                <span className="mx-2">•</span>
+                <span>Esc</span>
+                <span>para fechar</span>
+              </div>
+            </div>
+          )}
+          
+          {searchQuery && (
+            <div className="search-results-indicator mb-4">
+              <div className="search-count">
+                <span>Resultados para: </span>
+                <strong>{searchQuery}</strong>
+                <span className="ml-2">({filteredTrends.length} encontrados)</span>
+              </div>
+            </div>
+          )}
+          
+          {loading ? (
+            <div className="loading-state">
+              <div className="loading-spinner"></div>
+              <p>Carregando tendências...</p>
+            </div>
+          ) : error ? (
+            <div className="error-state">
+              <p>{error}</p>
+              <button onClick={() => window.location.reload()}>
+                Tentar novamente
+              </button>
+            </div>
+          ) : filteredTrends.length === 0 ? (
+            <div className="error-state">
+              <p>Nenhuma tendência encontrada para os filtros selecionados.</p>
+              <button onClick={() => {
+                setSearchQuery('');
+                setActiveTab('all');
+                setSelectedPlatform('all');
+              }}>
+                Limpar filtros
+              </button>
+            </div>
+          ) : (
+            <>
+              <div 
+                className="trends-grid" 
+                ref={trendsRef}
+              >
+                {paginatedTrends.map(trend => (
                   <TrendCard
                     key={trend.id}
                     trend={trend}
                     searchQuery={searchQuery}
-                    onTagClick={tag => setSearchQuery(tag)}
-                    isAnimating={isAnimating}
-                    index={index}
+                    onTagClick={handleTagClick}
+                    onClick={() => handleTrendClick(trend)}
                   />
-                ))
-              )}
-            </div>
-          </main>
-        </div>
+                ))}
+              </div>
+              
+              <Pagination 
+                currentPage={currentPage}
+                totalPages={totalPages}
+                onPageChange={handlePageChange}
+                itemsPerPage={itemsPerPage}
+                onItemsPerPageChange={handleItemsPerPageChange}
+                totalItems={filteredTrends.length}
+              />
+            </>
+          )}
+        </main>
       </div>
-    </ThemeProvider>
+    </div>
   );
 };
 

@@ -1,0 +1,53 @@
+.logo-container {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-2);
+}
+
+.logo-icon {
+  flex-shrink: 0;
+}
+
+.logo-sm {
+  width: 24px;
+  height: 24px;
+}
+
+.logo-md {
+  width: 32px;
+  height: 32px;
+}
+
+.logo-lg {
+  width: 48px;
+  height: 48px;
+}
+
+.logo-text {
+  font-weight: 700;
+  font-size: var(--font-size-xl);
+  letter-spacing: -0.02em;
+  display: flex;
+}
+
+.logo-text-trend {
+  background: linear-gradient(to right, var(--color-purple-600), var(--color-purple-500));
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+}
+
+.logo-text-pulse {
+  background: linear-gradient(to right, var(--color-purple-500), var(--color-pink-500));
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+}
+
+.dark .logo-text-trend,
+.dark .logo-text-pulse {
+  color: white;
+  background: none;
+  -webkit-background-clip: initial;
+  background-clip: initial;
+} 

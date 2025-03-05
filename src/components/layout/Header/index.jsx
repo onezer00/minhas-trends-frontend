@@ -1,7 +1,7 @@
 import React from 'react';
 import { Menu, Sun, Moon } from 'lucide-react';
-import { useTheme } from '../../../contexts/ThemeContext';
 import { SearchBar } from '../../search/SearchBar';
+import { Logo } from '../../common/Logo';
 import './styles.css';
 
 export function Header({
@@ -12,10 +12,10 @@ export function Header({
   onSearchFocus,
   onSearchKeyDown,
   onMobileMenuToggle,
+  darkMode,
+  onToggleDarkMode,
   isMobile = false
 }) {
-  const { darkMode, toggleDarkMode } = useTheme();
-
   return (
     <header className="header">
       <div className="header-container">
@@ -28,7 +28,7 @@ export function Header({
               <Menu size={24} />
             </button>
           )}
-          <h1 className="logo">TrendPulse</h1>
+          <Logo size={isMobile ? 'sm' : 'md'} />
         </div>
         
         <div className="header-center">
@@ -45,7 +45,7 @@ export function Header({
         
         <div className="header-right">
           <button 
-            onClick={toggleDarkMode}
+            onClick={onToggleDarkMode}
             className="theme-toggle-button"
             aria-label={darkMode ? "Ativar modo claro" : "Ativar modo escuro"}
           >
