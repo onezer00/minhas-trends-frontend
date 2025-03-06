@@ -3,6 +3,7 @@ import { X, Loader2, ChevronDown, ChevronUp } from 'lucide-react';
 import { PlatformIcon } from '../../common/PlatformIcon';
 import { Logo } from '../../common/Logo';
 import api from '../../../services/api';
+import { fallbackCategories } from '../../../services/fallbackData';
 import './styles.css';
 
 const platforms = [
@@ -44,14 +45,8 @@ export function Sidebar({
           categoriesArray = response.data;
         } else {
           console.warn('Sidebar - Formato de resposta inesperado para categorias:', response.data);
-          // Definir categorias padrão em caso de formato inesperado
-          categoriesArray = [
-            { name: 'tecnologia', count: 0 },
-            { name: 'entretenimento', count: 0 },
-            { name: 'esportes', count: 0 },
-            { name: 'ciência', count: 0 },
-            { name: 'finanças', count: 0 }
-          ];
+          console.log('Sidebar - Usando dados de fallback para categorias');
+          categoriesArray = fallbackCategories;
         }
         
         console.log('Sidebar - Dados processados (categorias):', categoriesArray);
@@ -86,15 +81,22 @@ export function Sidebar({
         setError('Erro ao carregar categorias');
         console.error('Erro ao buscar categorias:', err);
         
-        // Em caso de erro, definir categorias padrão
-        setCategories([
-          { name: 'all', count: 0 },
-          { name: 'tecnologia', count: 0 },
-          { name: 'entretenimento', count: 0 },
-          { name: 'esportes', count: 0 },
-          { name: 'ciência', count: 0 },
-          { name: 'finanças', count: 0 }
-        ]);
+        // Em caso de erro, usar dados de fallback
+        const totalCount = fallbackCategories.reduce((sum, cat) => sum + (Number(cat.count) || 0), 0);
+        
+        const formattedCategories = [
+          { name: 'all', count: totalCount },
+          ...fallbackCategories
+        ];
+        
+        // Ordenar categorias por contagem (exceto "Todas" que fica sempre no topo)
+        formattedCategories.sort((a, b) => {
+          if (a.name === 'all') return -1;
+          if (b.name === 'all') return 1;
+          return (Number(b.count) || 0) - (Number(a.count) || 0);
+        });
+        
+        setCategories(formattedCategories);
       } finally {
         setLoading(false);
       }

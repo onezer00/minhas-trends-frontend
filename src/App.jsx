@@ -8,6 +8,7 @@ import { Sidebar } from './components/layout/Sidebar';
 import { TrendCard } from './components/trends/TrendCard';
 import { Pagination } from './components/common/Pagination';
 import api from './services/api';
+import { fallbackTrends, fallbackCategories } from './services/fallbackData';
 
 const TrendPulseApp = () => {
   // Estados existentes
@@ -99,7 +100,8 @@ const TrendPulseApp = () => {
           trendsArray = response.data;
         } else {
           console.warn('Formato de resposta inesperado para tendências:', response.data);
-          trendsArray = [];
+          console.log('Usando dados de fallback para tendências');
+          trendsArray = fallbackTrends;
         }
         
         console.log('Dados processados (trends):', trendsArray);
@@ -124,8 +126,12 @@ const TrendPulseApp = () => {
         setTrends(validatedTrends);
         setFilteredTrends(validatedTrends);
       } catch (err) {
-        setError('Erro ao carregar tendências. Por favor, tente novamente mais tarde.');
+        setError('Erro ao carregar tendências. Usando dados de demonstração.');
         console.error('Erro ao buscar tendências:', err);
+        
+        // Usar dados de fallback em caso de erro
+        setTrends(fallbackTrends);
+        setFilteredTrends(fallbackTrends);
       } finally {
         setLoading(false);
       }
@@ -152,14 +158,8 @@ const TrendPulseApp = () => {
           categoriesArray = response.data;
         } else {
           console.warn('Formato de resposta inesperado para categorias:', response.data);
-          // Definir categorias padrão em caso de formato inesperado
-          categoriesArray = [
-            { name: 'tecnologia', count: 0 },
-            { name: 'entretenimento', count: 0 },
-            { name: 'esportes', count: 0 },
-            { name: 'ciência', count: 0 },
-            { name: 'finanças', count: 0 }
-          ];
+          console.log('Usando dados de fallback para categorias');
+          categoriesArray = fallbackCategories;
         }
         
         console.log('Dados processados (categorias):', categoriesArray);
@@ -185,14 +185,17 @@ const TrendPulseApp = () => {
         setCategories(formattedCategories);
       } catch (err) {
         console.error('Erro ao buscar categorias:', err);
-        // Em caso de erro, definir categorias padrão
+        
+        // Em caso de erro, usar dados de fallback
+        const totalCount = fallbackCategories.reduce((sum, cat) => sum + (Number(cat.count) || 0), 0);
+        
         setCategories([
-          { id: 'all', name: 'Tudo', count: 0 },
-          { id: 'tecnologia', name: 'Tecnologia', count: 0 },
-          { id: 'entretenimento', name: 'Entretenimento', count: 0 },
-          { id: 'esportes', name: 'Esportes', count: 0 },
-          { id: 'ciência', name: 'Ciência', count: 0 },
-          { id: 'finanças', name: 'Finanças', count: 0 }
+          { id: 'all', name: 'Tudo', count: totalCount },
+          ...fallbackCategories.map(cat => ({
+            id: cat.name,
+            name: cat.name.charAt(0).toUpperCase() + cat.name.slice(1),
+            count: Number(cat.count) || 0
+          }))
         ]);
       } finally {
         setLoadingCategories(false);
