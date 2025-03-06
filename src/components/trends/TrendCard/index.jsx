@@ -15,23 +15,26 @@ export function TrendCard({
   const [showReadMore, setShowReadMore] = useState(false);
   const descriptionRef = useRef(null);
 
+  // Verificar se trend existe e definir valores padrão para propriedades ausentes
   const {
-    id,
-    title,
-    description,
-    platform,
-    author,
-    views,
-    likes,
-    comments,
-    timeAgo,
-    tags,
-    url,
-    thumbnail
-  } = trend;
+    id = 'unknown',
+    title = 'Sem título',
+    description = 'Sem descrição',
+    platform = 'unknown',
+    author = 'Desconhecido',
+    views = 0,
+    likes = 0,
+    comments = 0,
+    timeAgo = 'agora',
+    tags = [],
+    url = '',
+    thumbnail = ''
+  } = trend || {};
 
   // Função para extrair URLs da descrição
-  const extractUrls = (description) => {
+  const extractUrls = (description = '') => {
+    if (!description) return { link: null, video: null, preview: null };
+    
     const linkMatch = description.match(/Link:\s*(.*?)(?=Vídeo:|Prévia:|$)/s);
     const videoMatch = description.match(/Vídeo:\s*(.*?)(?=Prévia:|$)/s);
     const previewMatch = description.match(/Prévia:\s*(.*?)(?=$)/s);
@@ -202,7 +205,7 @@ export function TrendCard({
 
         <div className="trend-card-footer">
           <div className="trend-tags">
-            {tags.map((tag, idx) => (
+            {Array.isArray(tags) && tags.map((tag, idx) => (
               <button
                 key={`${id}-${tag}-${idx}`}
                 onClick={(e) => {
@@ -238,14 +241,14 @@ export function TrendCard({
               onClick={(e) => e.stopPropagation()}
             >
               <ThumbsUp size={18} />
-              <span>{likes.toLocaleString('pt-BR')}</span>
+              <span>{typeof likes === 'number' ? likes.toLocaleString('pt-BR') : '0'}</span>
             </button>
             <button 
               className="action-button"
               onClick={(e) => e.stopPropagation()}
             >
               <MessageSquare size={18} />
-              <span>{comments.toLocaleString('pt-BR')}</span>
+              <span>{typeof comments === 'number' ? comments.toLocaleString('pt-BR') : '0'}</span>
             </button>
             <button 
               className="action-button"

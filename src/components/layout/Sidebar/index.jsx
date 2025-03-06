@@ -33,23 +33,45 @@ export function Sidebar({
         setError(null);
         const response = await api.get('/categories');
         
+        console.log('Sidebar - Categorias recebidas da API:', response.data);
+        
+        // Verificar se a resposta é um array ou está dentro de um objeto
+        const categoriesData = Array.isArray(response.data) 
+          ? response.data 
+          : (response.data.categories || response.data.data || []);
+        
+        // Calcular o total de tendências para a categoria "Todas"
+        const totalCount = Array.isArray(categoriesData) 
+          ? categoriesData.reduce((sum, cat) => sum + (cat.count || 0), 0)
+          : 0;
+        
         // Adicionar a categoria "Todas" no início
         const formattedCategories = [
-          { name: 'all', count: response.data.reduce((sum, cat) => sum + cat.count, 0) },
-          ...response.data
+          { name: 'all', count: totalCount },
+          ...(Array.isArray(categoriesData) ? categoriesData : [])
         ];
         
         // Ordenar categorias por contagem (exceto "Todas" que fica sempre no topo)
         formattedCategories.sort((a, b) => {
           if (a.name === 'all') return -1;
           if (b.name === 'all') return 1;
-          return b.count - a.count;
+          return (b.count || 0) - (a.count || 0);
         });
         
         setCategories(formattedCategories);
       } catch (err) {
         setError('Erro ao carregar categorias');
         console.error('Erro ao buscar categorias:', err);
+        
+        // Em caso de erro, definir categorias padrão
+        setCategories([
+          { name: 'all', count: 0 },
+          { name: 'tecnologia', count: 0 },
+          { name: 'entretenimento', count: 0 },
+          { name: 'esportes', count: 0 },
+          { name: 'ciência', count: 0 },
+          { name: 'finanças', count: 0 }
+        ]);
       } finally {
         setLoading(false);
       }

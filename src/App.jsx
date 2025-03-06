@@ -87,8 +87,17 @@ const TrendPulseApp = () => {
         setLoading(true);
         setError(null);
         const response = await api.get('/trends');
-        setTrends(response.data);
-        setFilteredTrends(response.data);
+        
+        // Verificar se a resposta é um array ou está dentro de um objeto
+        const trendsData = Array.isArray(response.data) 
+          ? response.data 
+          : (response.data.trends || response.data.data || []);
+        
+        console.log('Dados recebidos da API:', response.data);
+        console.log('Dados processados:', trendsData);
+        
+        setTrends(trendsData);
+        setFilteredTrends(trendsData);
       } catch (err) {
         setError('Erro ao carregar tendências. Por favor, tente novamente mais tarde.');
         console.error('Erro ao buscar tendências:', err);
@@ -107,14 +116,26 @@ const TrendPulseApp = () => {
         setLoadingCategories(true);
         const response = await api.get('/categories');
         
+        console.log('Categorias recebidas da API:', response.data);
+        
+        // Verificar se a resposta é um array ou está dentro de um objeto
+        const categoriesData = Array.isArray(response.data) 
+          ? response.data 
+          : (response.data.categories || response.data.data || []);
+        
+        // Calcular o total de tendências para a categoria "Tudo"
+        const totalCount = Array.isArray(categoriesData) 
+          ? categoriesData.reduce((sum, cat) => sum + (cat.count || 0), 0)
+          : 0;
+        
         // Formatar categorias para uso nos componentes
         const formattedCategories = [
-          { id: 'all', name: 'Tudo', count: response.data.reduce((sum, cat) => sum + cat.count, 0) },
-          ...response.data.map(cat => ({
+          { id: 'all', name: 'Tudo', count: totalCount },
+          ...(Array.isArray(categoriesData) ? categoriesData.map(cat => ({
             id: cat.name,
             name: cat.name.charAt(0).toUpperCase() + cat.name.slice(1),
-            count: cat.count
-          }))
+            count: cat.count || 0
+          })) : [])
         ];
         
         setCategories(formattedCategories);
@@ -136,26 +157,35 @@ const TrendPulseApp = () => {
 
     fetchCategories();
   }, []);
-
+  
   // Extrai todas as palavras-chave únicas de todos os dados para autocompletar
   const allKeywords = useMemo(() => {
     const keywordSet = new Set();
     
-    trends.forEach(trend => {
-      // Adiciona palavras do título (divididas por espaço, removendo palavras comuns)
-      const titleWords = trend.title.toLowerCase().split(' ')
-        .filter(word => word.length > 3 && !['como', 'para', 'mais', 'está', 'esse', 'essa', 'este', 'esta'].includes(word));
-      titleWords.forEach(word => keywordSet.add(word));
-      
-      // Adiciona todas as tags
-      trend.tags.forEach(tag => keywordSet.add(tag.toLowerCase()));
-      
-      // Adiciona a categoria
-      keywordSet.add(trend.category.toLowerCase());
-      
-      // Adiciona a plataforma
-      keywordSet.add(trend.platform.toLowerCase());
-    });
+    // Verificar se trends é um array antes de usar forEach
+    if (Array.isArray(trends)) {
+      trends.forEach(trend => {
+        // Adiciona palavras do título (divididas por espaço, removendo palavras comuns)
+        const titleWords = trend.title.toLowerCase().split(' ')
+          .filter(word => word.length > 3 && !['como', 'para', 'mais', 'está', 'esse', 'essa', 'este', 'esta'].includes(word));
+        titleWords.forEach(word => keywordSet.add(word));
+        
+        // Adiciona todas as tags se existirem
+        if (Array.isArray(trend.tags)) {
+          trend.tags.forEach(tag => keywordSet.add(tag.toLowerCase()));
+        }
+        
+        // Adiciona a categoria
+        if (trend.category) {
+          keywordSet.add(trend.category.toLowerCase());
+        }
+        
+        // Adiciona a plataforma
+        if (trend.platform) {
+          keywordSet.add(trend.platform.toLowerCase());
+        }
+      });
+    }
     
     return Array.from(keywordSet);
   }, [trends]);
