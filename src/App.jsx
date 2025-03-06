@@ -91,15 +91,38 @@ const TrendPulseApp = () => {
         console.log('Dados recebidos da API (trends):', response.data);
         
         // Verificar se a resposta está dentro de um objeto "trends"
-        const trendsData = response.data.trends || response.data;
+        let trendsArray = [];
         
-        // Garantir que temos um array
-        const trendsArray = Array.isArray(trendsData) ? trendsData : [];
+        if (response.data && response.data.trends && Array.isArray(response.data.trends)) {
+          trendsArray = response.data.trends;
+        } else if (Array.isArray(response.data)) {
+          trendsArray = response.data;
+        } else {
+          console.warn('Formato de resposta inesperado para tendências:', response.data);
+          trendsArray = [];
+        }
         
         console.log('Dados processados (trends):', trendsArray);
         
-        setTrends(trendsArray);
-        setFilteredTrends(trendsArray);
+        // Verificar e corrigir cada item das tendências
+        const validatedTrends = trendsArray.map(trend => {
+          if (!trend) return null;
+          
+          // Garantir que tags seja sempre um array
+          if (!Array.isArray(trend.tags)) {
+            trend.tags = [];
+          }
+          
+          // Garantir que outros campos numéricos sejam números
+          trend.views = Number(trend.views) || 0;
+          trend.likes = Number(trend.likes) || 0;
+          trend.comments = Number(trend.comments) || 0;
+          
+          return trend;
+        }).filter(Boolean); // Remover itens nulos
+        
+        setTrends(validatedTrends);
+        setFilteredTrends(validatedTrends);
       } catch (err) {
         setError('Erro ao carregar tendências. Por favor, tente novamente mais tarde.');
         console.error('Erro ao buscar tendências:', err);
@@ -121,23 +144,41 @@ const TrendPulseApp = () => {
         console.log('Dados recebidos da API (categorias):', response.data);
         
         // Verificar se a resposta está dentro de um objeto "categories"
-        const categoriesData = response.data.categories || response.data;
+        let categoriesArray = [];
         
-        // Garantir que temos um array
-        const categoriesArray = Array.isArray(categoriesData) ? categoriesData : [];
+        if (response.data && response.data.categories && Array.isArray(response.data.categories)) {
+          categoriesArray = response.data.categories;
+        } else if (Array.isArray(response.data)) {
+          categoriesArray = response.data;
+        } else {
+          console.warn('Formato de resposta inesperado para categorias:', response.data);
+          // Definir categorias padrão em caso de formato inesperado
+          categoriesArray = [
+            { name: 'tecnologia', count: 0 },
+            { name: 'entretenimento', count: 0 },
+            { name: 'esportes', count: 0 },
+            { name: 'ciência', count: 0 },
+            { name: 'finanças', count: 0 }
+          ];
+        }
         
         console.log('Dados processados (categorias):', categoriesArray);
         
-        // Calcular o total de tendências para a categoria "Tudo"
-        const totalCount = categoriesArray.reduce((sum, cat) => sum + (cat.count || 0), 0);
+        // Calcular o total de tendências para a categoria "Tudo" com verificação de segurança
+        let totalCount = 0;
+        try {
+          totalCount = categoriesArray.reduce((sum, cat) => sum + (Number(cat.count) || 0), 0);
+        } catch (reduceError) {
+          console.error('Erro ao calcular total de categorias:', reduceError);
+        }
         
         // Formatar categorias para uso nos componentes
         const formattedCategories = [
           { id: 'all', name: 'Tudo', count: totalCount },
           ...categoriesArray.map(cat => ({
-            id: cat.name,
-            name: cat.name.charAt(0).toUpperCase() + cat.name.slice(1),
-            count: cat.count || 0
+            id: cat.name || 'unknown',
+            name: cat.name ? (cat.name.charAt(0).toUpperCase() + cat.name.slice(1)) : 'Desconhecido',
+            count: Number(cat.count) || 0
           }))
         ];
         
@@ -146,12 +187,12 @@ const TrendPulseApp = () => {
         console.error('Erro ao buscar categorias:', err);
         // Em caso de erro, definir categorias padrão
         setCategories([
-          { id: 'all', name: 'Tudo' },
-          { id: 'tecnologia', name: 'Tecnologia' },
-          { id: 'entretenimento', name: 'Entretenimento' },
-          { id: 'esportes', name: 'Esportes' },
-          { id: 'ciência', name: 'Ciência' },
-          { id: 'finanças', name: 'Finanças' }
+          { id: 'all', name: 'Tudo', count: 0 },
+          { id: 'tecnologia', name: 'Tecnologia', count: 0 },
+          { id: 'entretenimento', name: 'Entretenimento', count: 0 },
+          { id: 'esportes', name: 'Esportes', count: 0 },
+          { id: 'ciência', name: 'Ciência', count: 0 },
+          { id: 'finanças', name: 'Finanças', count: 0 }
         ]);
       } finally {
         setLoadingCategories(false);
@@ -165,31 +206,39 @@ const TrendPulseApp = () => {
   const allKeywords = useMemo(() => {
     const keywordSet = new Set();
     
-    // Verificar se trends é um array antes de usar forEach
-    if (Array.isArray(trends)) {
-      trends.forEach(trend => {
-        // Adiciona palavras do título (divididas por espaço, removendo palavras comuns)
-        if (trend.title) {
-          const titleWords = trend.title.toLowerCase().split(' ')
-            .filter(word => word.length > 3 && !['como', 'para', 'mais', 'está', 'esse', 'essa', 'este', 'esta'].includes(word));
-          titleWords.forEach(word => keywordSet.add(word));
-        }
-        
-        // Adiciona todas as tags se existirem
-        if (Array.isArray(trend.tags)) {
-          trend.tags.forEach(tag => keywordSet.add(tag.toLowerCase()));
-        }
-        
-        // Adiciona a categoria
-        if (trend.category) {
-          keywordSet.add(trend.category.toLowerCase());
-        }
-        
-        // Adiciona a plataforma
-        if (trend.platform) {
-          keywordSet.add(trend.platform.toLowerCase());
-        }
-      });
+    try {
+      // Verificar se trends é um array antes de usar forEach
+      if (Array.isArray(trends)) {
+        trends.forEach(trend => {
+          if (!trend) return; // Pular se o item for nulo ou indefinido
+          
+          // Adiciona palavras do título (divididas por espaço, removendo palavras comuns)
+          if (trend.title) {
+            const titleWords = trend.title.toLowerCase().split(' ')
+              .filter(word => word.length > 3 && !['como', 'para', 'mais', 'está', 'esse', 'essa', 'este', 'esta'].includes(word));
+            titleWords.forEach(word => keywordSet.add(word));
+          }
+          
+          // Adiciona todas as tags se existirem
+          if (Array.isArray(trend.tags)) {
+            trend.tags.forEach(tag => keywordSet.add(tag.toLowerCase()));
+          }
+          
+          // Adiciona a categoria
+          if (trend.category) {
+            keywordSet.add(trend.category.toLowerCase());
+          }
+          
+          // Adiciona a plataforma
+          if (trend.platform) {
+            keywordSet.add(trend.platform.toLowerCase());
+          }
+        });
+      } else {
+        console.warn('trends não é um array:', trends);
+      }
+    } catch (error) {
+      console.error('Erro ao processar palavras-chave:', error);
     }
     
     return Array.from(keywordSet);

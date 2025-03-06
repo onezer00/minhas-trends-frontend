@@ -36,15 +36,33 @@ export function Sidebar({
         console.log('Sidebar - Dados recebidos da API (categorias):', response.data);
         
         // Verificar se a resposta está dentro de um objeto "categories"
-        const categoriesData = response.data.categories || response.data;
+        let categoriesArray = [];
         
-        // Garantir que temos um array
-        const categoriesArray = Array.isArray(categoriesData) ? categoriesData : [];
+        if (response.data && response.data.categories && Array.isArray(response.data.categories)) {
+          categoriesArray = response.data.categories;
+        } else if (Array.isArray(response.data)) {
+          categoriesArray = response.data;
+        } else {
+          console.warn('Sidebar - Formato de resposta inesperado para categorias:', response.data);
+          // Definir categorias padrão em caso de formato inesperado
+          categoriesArray = [
+            { name: 'tecnologia', count: 0 },
+            { name: 'entretenimento', count: 0 },
+            { name: 'esportes', count: 0 },
+            { name: 'ciência', count: 0 },
+            { name: 'finanças', count: 0 }
+          ];
+        }
         
         console.log('Sidebar - Dados processados (categorias):', categoriesArray);
         
-        // Calcular o total de tendências para a categoria "Todas"
-        const totalCount = categoriesArray.reduce((sum, cat) => sum + (cat.count || 0), 0);
+        // Calcular o total de tendências para a categoria "Todas" com verificação de segurança
+        let totalCount = 0;
+        try {
+          totalCount = categoriesArray.reduce((sum, cat) => sum + (Number(cat.count) || 0), 0);
+        } catch (reduceError) {
+          console.error('Sidebar - Erro ao calcular total de categorias:', reduceError);
+        }
         
         // Adicionar a categoria "Todas" no início
         const formattedCategories = [
@@ -53,11 +71,15 @@ export function Sidebar({
         ];
         
         // Ordenar categorias por contagem (exceto "Todas" que fica sempre no topo)
-        formattedCategories.sort((a, b) => {
-          if (a.name === 'all') return -1;
-          if (b.name === 'all') return 1;
-          return (b.count || 0) - (a.count || 0);
-        });
+        try {
+          formattedCategories.sort((a, b) => {
+            if (a.name === 'all') return -1;
+            if (b.name === 'all') return 1;
+            return (Number(b.count) || 0) - (Number(a.count) || 0);
+          });
+        } catch (sortError) {
+          console.error('Sidebar - Erro ao ordenar categorias:', sortError);
+        }
         
         setCategories(formattedCategories);
       } catch (err) {
