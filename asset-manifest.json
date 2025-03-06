@@ -1,15 +1,15 @@
 {
   "files": {
     "main.css": "/minhas-trends-frontend/static/css/main.0b4879e1.css",
-    "main.js": "/minhas-trends-frontend/static/js/main.2733c668.js",
+    "main.js": "/minhas-trends-frontend/static/js/main.f6a6108b.js",
     "static/js/453.75f8dd8e.chunk.js": "/minhas-trends-frontend/static/js/453.75f8dd8e.chunk.js",
     "index.html": "/minhas-trends-frontend/index.html",
     "main.0b4879e1.css.map": "/minhas-trends-frontend/static/css/main.0b4879e1.css.map",
-    "main.2733c668.js.map": "/minhas-trends-frontend/static/js/main.2733c668.js.map",
+    "main.f6a6108b.js.map": "/minhas-trends-frontend/static/js/main.f6a6108b.js.map",
     "453.75f8dd8e.chunk.js.map": "/minhas-trends-frontend/static/js/453.75f8dd8e.chunk.js.map"
   },
   "entrypoints": [
     "static/css/main.0b4879e1.css",
-    "static/js/main.2733c668.js"
+    "static/js/main.f6a6108b.js"
   ]
 }
