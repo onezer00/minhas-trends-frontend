@@ -2,6 +2,7 @@ import React from 'react';
 import { Menu, Sun, Moon } from 'lucide-react';
 import { SearchBar } from '../../search/SearchBar';
 import { Logo } from '../../common/Logo';
+import { DonateButton } from '../../common/DonateButton';
 import './styles.css';
 
 export function Header({
@@ -44,6 +45,8 @@ export function Header({
         </div>
         
         <div className="header-right">
+          <DonateButton />
+          
           <button 
             onClick={onToggleDarkMode}
             className="theme-toggle-button"

@@ -89,14 +89,20 @@
 .header-right {
   display: flex;
   align-items: center;
-  gap: var(--spacing-4);
+  gap: var(--spacing-3);
 }
 
 .theme-toggle-button {
-  padding: var(--spacing-2);
+  width: 40px;
+  height: 40px;
   border-radius: var(--radius-full);
-  transition: all var(--transition-base) var(--ease-in-out);
+  display: flex;
+  align-items: center;
+  justify-content: center;
   background-color: rgba(243, 244, 246, 0.5);
+  border: none;
+  cursor: pointer;
+  transition: all var(--transition-base) var(--ease-in-out);
   backdrop-filter: blur(4px);
   -webkit-backdrop-filter: blur(4px);
 }
@@ -135,5 +141,17 @@
 
   .header-container {
     padding: var(--spacing-2) var(--spacing-4);
+  }
+  
+  .header-right {
+    gap: var(--spacing-2);
+  }
+  
+  .donate-button span {
+    display: none;
+  }
+  
+  .donate-button {
+    padding: 8px;
   }
 } 
