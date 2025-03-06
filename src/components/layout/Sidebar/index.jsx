@@ -33,22 +33,23 @@ export function Sidebar({
         setError(null);
         const response = await api.get('/categories');
         
-        console.log('Sidebar - Categorias recebidas da API:', response.data);
+        console.log('Sidebar - Dados recebidos da API (categorias):', response.data);
         
-        // Verificar se a resposta é um array ou está dentro de um objeto
-        const categoriesData = Array.isArray(response.data) 
-          ? response.data 
-          : (response.data.categories || response.data.data || []);
+        // Verificar se a resposta está dentro de um objeto "categories"
+        const categoriesData = response.data.categories || response.data;
+        
+        // Garantir que temos um array
+        const categoriesArray = Array.isArray(categoriesData) ? categoriesData : [];
+        
+        console.log('Sidebar - Dados processados (categorias):', categoriesArray);
         
         // Calcular o total de tendências para a categoria "Todas"
-        const totalCount = Array.isArray(categoriesData) 
-          ? categoriesData.reduce((sum, cat) => sum + (cat.count || 0), 0)
-          : 0;
+        const totalCount = categoriesArray.reduce((sum, cat) => sum + (cat.count || 0), 0);
         
         // Adicionar a categoria "Todas" no início
         const formattedCategories = [
           { name: 'all', count: totalCount },
-          ...(Array.isArray(categoriesData) ? categoriesData : [])
+          ...categoriesArray
         ];
         
         // Ordenar categorias por contagem (exceto "Todas" que fica sempre no topo)

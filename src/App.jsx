@@ -88,16 +88,18 @@ const TrendPulseApp = () => {
         setError(null);
         const response = await api.get('/trends');
         
-        // Verificar se a resposta é um array ou está dentro de um objeto
-        const trendsData = Array.isArray(response.data) 
-          ? response.data 
-          : (response.data.trends || response.data.data || []);
+        console.log('Dados recebidos da API (trends):', response.data);
         
-        console.log('Dados recebidos da API:', response.data);
-        console.log('Dados processados:', trendsData);
+        // Verificar se a resposta está dentro de um objeto "trends"
+        const trendsData = response.data.trends || response.data;
         
-        setTrends(trendsData);
-        setFilteredTrends(trendsData);
+        // Garantir que temos um array
+        const trendsArray = Array.isArray(trendsData) ? trendsData : [];
+        
+        console.log('Dados processados (trends):', trendsArray);
+        
+        setTrends(trendsArray);
+        setFilteredTrends(trendsArray);
       } catch (err) {
         setError('Erro ao carregar tendências. Por favor, tente novamente mais tarde.');
         console.error('Erro ao buscar tendências:', err);
@@ -116,26 +118,27 @@ const TrendPulseApp = () => {
         setLoadingCategories(true);
         const response = await api.get('/categories');
         
-        console.log('Categorias recebidas da API:', response.data);
+        console.log('Dados recebidos da API (categorias):', response.data);
         
-        // Verificar se a resposta é um array ou está dentro de um objeto
-        const categoriesData = Array.isArray(response.data) 
-          ? response.data 
-          : (response.data.categories || response.data.data || []);
+        // Verificar se a resposta está dentro de um objeto "categories"
+        const categoriesData = response.data.categories || response.data;
+        
+        // Garantir que temos um array
+        const categoriesArray = Array.isArray(categoriesData) ? categoriesData : [];
+        
+        console.log('Dados processados (categorias):', categoriesArray);
         
         // Calcular o total de tendências para a categoria "Tudo"
-        const totalCount = Array.isArray(categoriesData) 
-          ? categoriesData.reduce((sum, cat) => sum + (cat.count || 0), 0)
-          : 0;
+        const totalCount = categoriesArray.reduce((sum, cat) => sum + (cat.count || 0), 0);
         
         // Formatar categorias para uso nos componentes
         const formattedCategories = [
           { id: 'all', name: 'Tudo', count: totalCount },
-          ...(Array.isArray(categoriesData) ? categoriesData.map(cat => ({
+          ...categoriesArray.map(cat => ({
             id: cat.name,
             name: cat.name.charAt(0).toUpperCase() + cat.name.slice(1),
             count: cat.count || 0
-          })) : [])
+          }))
         ];
         
         setCategories(formattedCategories);
@@ -166,9 +169,11 @@ const TrendPulseApp = () => {
     if (Array.isArray(trends)) {
       trends.forEach(trend => {
         // Adiciona palavras do título (divididas por espaço, removendo palavras comuns)
-        const titleWords = trend.title.toLowerCase().split(' ')
-          .filter(word => word.length > 3 && !['como', 'para', 'mais', 'está', 'esse', 'essa', 'este', 'esta'].includes(word));
-        titleWords.forEach(word => keywordSet.add(word));
+        if (trend.title) {
+          const titleWords = trend.title.toLowerCase().split(' ')
+            .filter(word => word.length > 3 && !['como', 'para', 'mais', 'está', 'esse', 'essa', 'este', 'esta'].includes(word));
+          titleWords.forEach(word => keywordSet.add(word));
+        }
         
         // Adiciona todas as tags se existirem
         if (Array.isArray(trend.tags)) {

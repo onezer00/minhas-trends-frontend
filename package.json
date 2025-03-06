@@ -24,7 +24,7 @@
     "build": "set \"CI=false\" && react-scripts build",
     "test": "react-scripts test",
     "eject": "react-scripts eject",
-    "update-favicon": "node scripts/update-favicon.js",
+    "update-favicon": "node scripts/update-favicon.js && node scripts/create-placeholder-icons.js",
     "prebuild": "npm run update-favicon"
   },
   "eslintConfig": {
