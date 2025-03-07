@@ -46,7 +46,7 @@ export function Header({
             onFocus={onSearchFocus}
             onKeyDown={onSearchKeyDown}
             className="header-search"
-            placeholder={t('header.search')}
+            placeholder={t('Pesquise aqui por pots, usuários, etc...')}
           />
         </div>
         
