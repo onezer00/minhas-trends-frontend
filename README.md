@@ -1,81 +1,167 @@
-# Getting Started with Create React App
+# TrendPulse Frontend
 
-This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
+[![React](https://img.shields.io/badge/React-18.2.0-61DAFB.svg?style=flat&logo=react&logoColor=white)](https://reactjs.org/)
+[![TypeScript](https://img.shields.io/badge/TypeScript-5.0.0-3178C6.svg?style=flat&logo=typescript&logoColor=white)](https://www.typescriptlang.org/)
+[![Material-UI](https://img.shields.io/badge/MUI-5.15.0-007FFF.svg?style=flat&logo=mui&logoColor=white)](https://mui.com/)
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 
-## Available Scripts
+Interface web moderna e responsiva para o TrendPulse, um agregador de tendências que reúne conteúdo popular do YouTube e Reddit em um só lugar.
 
-In the project directory, you can run:
+## 🚀 Recursos
 
-### `npm start`
+- **Design Responsivo:** Interface adaptável para desktop e dispositivos móveis
+- **Temas Claro/Escuro:** Suporte a diferentes temas para melhor experiência visual
+- **Filtragem Avançada:** Filtros por plataforma, categoria e período
+- **Visualização em Tempo Real:** Atualização automática das tendências
+- **Compartilhamento:** Botões para compartilhar tendências nas redes sociais
+- **Pesquisa Instantânea:** Busca rápida por palavras-chave
+- **Categorização Visual:** Ícones e cores para diferentes categorias de conteúdo
 
-Runs the app in the development mode.\
-Open [http://localhost:3000](http://localhost:3000) to view it in your browser.
+## 🛠️ Tecnologias
 
-The page will reload when you make changes.\
-You may also see any lint errors in the console.
+- **React 18:** Para construção da interface
+- **TypeScript:** Tipagem estática para maior segurança
+- **Material-UI (MUI):** Componentes de UI modernos
+- **React Query:** Gerenciamento de estado e cache
+- **React Router:** Navegação entre páginas
+- **Axios:** Requisições HTTP
+- **date-fns:** Formatação de datas
+- **React Icons:** Biblioteca de ícones
 
-### `npm test`
+## 📦 Instalação
 
-Launches the test runner in the interactive watch mode.\
-See the section about [running tests](https://facebook.github.io/create-react-app/docs/running-tests) for more information.
+1. Clone o repositório:
+   ```bash
+   git clone https://github.com/seu-usuario/trendpulse-frontend.git
+   cd trendpulse-frontend
+   ```
 
-### `npm run build`
+2. Instale as dependências:
+   ```bash
+   npm install
+   ```
 
-Builds the app for production to the `build` folder.\
-It correctly bundles React in production mode and optimizes the build for the best performance.
+3. Configure as variáveis de ambiente:
+   ```bash
+   # .env.development
+   REACT_APP_API_URL=http://localhost:8000
+   
+   # .env.production
+   REACT_APP_API_URL=https://trendpulse-api.onrender.com
+   ```
 
-The build is minified and the filenames include the hashes.\
-Your app is ready to be deployed!
+4. Inicie o servidor de desenvolvimento:
+   ```bash
+   npm start
+   ```
 
-See the section about [deployment](https://facebook.github.io/create-react-app/docs/deployment) for more information.
+## 🚀 Deploy
 
-### `npm run eject`
+O frontend está configurado para deploy automático no GitHub Pages:
 
-**Note: this is a one-way operation. Once you `eject`, you can't go back!**
+1. Atualize a propriedade `homepage` no `package.json`:
+   ```json
+   {
+     "homepage": "https://seu-usuario.github.io/trendpulse-frontend"
+   }
+   ```
 
-If you aren't satisfied with the build tool and configuration choices, you can `eject` at any time. This command will remove the single build dependency from your project.
+2. Execute o deploy:
+   ```bash
+   npm run deploy
+   ```
 
-Instead, it will copy all the configuration files and the transitive dependencies (webpack, Babel, ESLint, etc) right into your project so you have full control over them. All of the commands except `eject` will still work, but they will point to the copied scripts so you can tweak them. At this point you're on your own.
+## 🎨 Personalização
 
-You don't have to ever use `eject`. The curated feature set is suitable for small and middle deployments, and you shouldn't feel obligated to use this feature. However we understand that this tool wouldn't be useful if you couldn't customize it when you are ready for it.
+### Temas
 
-## Learn More
+O TrendPulse suporta temas claro e escuro. Para personalizar:
 
-You can learn more in the [Create React App documentation](https://facebook.github.io/create-react-app/docs/getting-started).
+1. Edite os arquivos de tema em `src/theme/`:
+   ```typescript
+   // theme/light.ts ou theme/dark.ts
+   export const lightTheme = {
+     // Suas customizações aqui
+   };
+   ```
 
-To learn React, check out the [React documentation](https://reactjs.org/).
+2. Use o hook de tema:
+   ```typescript
+   const { theme, toggleTheme } = useTheme();
+   ```
 
-### Code Splitting
+### Estilos
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/code-splitting](https://facebook.github.io/create-react-app/docs/code-splitting)
+- Componentes estilizados usando MUI `styled`:
+  ```typescript
+  const StyledCard = styled(Card)(({ theme }) => ({
+    // Seus estilos aqui
+  }));
+  ```
 
-### Analyzing the Bundle Size
+## 📱 Layout Responsivo
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/analyzing-the-bundle-size](https://facebook.github.io/create-react-app/docs/analyzing-the-bundle-size)
+O TrendPulse é totalmente responsivo, adaptando-se a diferentes tamanhos de tela:
 
-### Making a Progressive Web App
+- **Desktop:** Layout em grid com 3-4 colunas
+- **Tablet:** 2 colunas
+- **Mobile:** 1 coluna com cards empilhados
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/making-a-progressive-web-app](https://facebook.github.io/create-react-app/docs/making-a-progressive-web-app)
+## 🔄 Integração com Backend
 
-### Advanced Configuration
+A comunicação com a API é feita através do Axios:
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/advanced-configuration](https://facebook.github.io/create-react-app/docs/advanced-configuration)
+```typescript
+const api = axios.create({
+  baseURL: process.env.REACT_APP_API_URL,
+});
+```
 
-### Configuração de Ambiente
+## 📊 Análise de Código
 
-O projeto utiliza detecção automática de ambiente para configurar a URL da API:
+O projeto utiliza várias ferramentas para garantir qualidade:
 
-- **Desenvolvimento**: Quando executado localmente, a aplicação usa automaticamente a URL `http://localhost:8000/api`
-- **Produção**: Quando hospedado no GitHub Pages (onezer00.github.io), a aplicação usa automaticamente a URL `https://trendpulse-api.onrender.com/api`
+- **ESLint:** Análise estática de código
+- **Prettier:** Formatação consistente
+- **TypeScript:** Verificação de tipos
+- **Husky:** Hooks de git para verificações pré-commit
 
-A detecção é feita no arquivo `src/services/api.js` com base no hostname e na variável de ambiente `NODE_ENV`.
+## 🧪 Testes
 
-Esta abordagem elimina a necessidade de arquivos `.env` e `.env.production`, tornando a configuração mais segura e fácil de manter.
+Execute os testes com:
 
-### Deployment
+```bash
+# Testes unitários
+npm test
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/deployment](https://facebook.github.io/create-react-app/docs/deployment)
+# Cobertura de testes
+npm run test:coverage
+```
 
-### `npm run build` fails to minify
+## 📚 Documentação de Componentes
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify](https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify)
+A documentação dos componentes é feita usando Storybook:
+
+```bash
+# Inicie o Storybook
+npm run storybook
+```
+
+## 🤝 Contribuindo
+
+1. Faça um fork do projeto
+2. Crie uma branch para sua feature (`git checkout -b feature/AmazingFeature`)
+3. Commit suas mudanças (`git commit -m 'Add some AmazingFeature'`)
+4. Push para a branch (`git push origin feature/AmazingFeature`)
+5. Abra um Pull Request
+
+## 📝 Licença
+
+Este projeto está sob a licença MIT. Veja o arquivo [LICENSE](LICENSE) para mais detalhes.
+
+## 🔗 Links Úteis
+
+- [Backend do TrendPulse](https://github.com/seu-usuario/trendpulse-backend)
+- [Documentação da API](https://trendpulse-api.onrender.com/docs)
+- [Material-UI Docs](https://mui.com/docs)
+- [React Query Docs](https://tanstack.com/query/latest)
