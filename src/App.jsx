@@ -9,8 +9,9 @@ import { TrendCard } from './components/trends/TrendCard';
 import { Pagination } from './components/common/Pagination';
 import api from './services/api';
 import { fallbackTrends, fallbackCategories } from './services/fallbackData';
+import './App.css';
 
-const TrendPulseApp = () => {
+const TrendPulseApp = ({ version }) => {
   // Estados existentes
   const [activeTab, setActiveTab] = useState('all');
   const [showMobileMenu, setShowMobileMenu] = useState(false);
@@ -618,6 +619,52 @@ const TrendPulseApp = () => {
       window.removeEventListener('resize', detectCardsPerRow);
     };
   }, []);
+
+  // Detectar mudanças no tamanho da tela
+  const [isMobile, setIsMobile] = useState(window.innerWidth <= 768);
+  useEffect(() => {
+    const handleResize = () => {
+      const mobile = window.innerWidth <= 768;
+      setIsMobile(mobile);
+      
+      // Se a tela for redimensionada para desktop, fechar o menu móvel
+      if (!mobile && showMobileMenu) {
+        setShowMobileMenu(false);
+      }
+    };
+
+    window.addEventListener('resize', handleResize);
+    return () => window.removeEventListener('resize', handleResize);
+  }, [showMobileMenu]);
+  
+  // Adicionar um handler para fechar o menu quando clicar fora dele
+  useEffect(() => {
+    const handleClickOutside = (event) => {
+      // Se o menu estiver aberto e o clique não for dentro do menu
+      if (showMobileMenu) {
+        const sidebar = document.querySelector('.sidebar');
+        const menuButton = document.querySelector('.mobile-menu-button');
+        
+        if (sidebar && !sidebar.contains(event.target) && 
+            menuButton && !menuButton.contains(event.target) &&
+            !event.target.classList.contains('mobile-backdrop')) {
+          setShowMobileMenu(false);
+        }
+      }
+    };
+
+    // Usar touchstart para dispositivos móveis
+    if (isMobile) {
+      document.addEventListener('touchstart', handleClickOutside, { passive: true });
+    } else {
+      document.addEventListener('mousedown', handleClickOutside);
+    }
+    
+    return () => {
+      document.removeEventListener('touchstart', handleClickOutside);
+      document.removeEventListener('mousedown', handleClickOutside);
+    };
+  }, [showMobileMenu, isMobile]);
 
   return (
     <div className="app">

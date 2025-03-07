@@ -1,0 +1,165 @@
+.translate-container {
+  position: relative;
+  z-index: 100;
+}
+
+.translate-button {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 16px;
+  background: linear-gradient(135deg, #4285F4 0%, #34A853 100%);
+  color: white;
+  border: none;
+  border-radius: var(--radius-full);
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  box-shadow: 0 4px 6px rgba(66, 133, 244, 0.2);
+  /* Desabilitar o botão  - Removendo visualização */
+  display: none;
+}
+
+/* Estilo para quando o idioma está em português */
+.translate-button.translated {
+  background: linear-gradient(135deg, #009739 0%, #FBBC05 100%);
+  box-shadow: 0 4px 6px rgba(0, 151, 57, 0.2);
+}
+
+.translate-button.disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+  background: linear-gradient(135deg, #9e9e9e 0%, #616161 100%);
+  box-shadow: none;
+}
+
+.translate-button:hover:not(.disabled) {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 10px rgba(66, 133, 244, 0.3);
+}
+
+.translate-button.translated:hover {
+  box-shadow: 0 6px 10px rgba(0, 151, 57, 0.3);
+}
+
+.translate-button svg {
+  color: white;
+  transition: transform 0.3s ease;
+}
+
+.translate-button:hover:not(.disabled) svg {
+  transform: scale(1.2);
+}
+
+.external-icon {
+  margin-left: 4px;
+  opacity: 0.7;
+}
+
+/* Animação de carregamento */
+.translating-indicator {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 4px;
+}
+
+.dot {
+  width: 6px;
+  height: 6px;
+  background-color: white;
+  border-radius: 50%;
+  animation: dotPulse 1.5s infinite ease-in-out;
+}
+
+.dot:nth-child(2) {
+  animation-delay: 0.2s;
+}
+
+.dot:nth-child(3) {
+  animation-delay: 0.4s;
+}
+
+@keyframes dotPulse {
+  0%, 100% {
+    transform: scale(0.8);
+    opacity: 0.6;
+  }
+  50% {
+    transform: scale(1.2);
+    opacity: 1;
+  }
+}
+
+/* Estilos para dispositivos móveis */
+@media (max-width: 768px) {
+  .translate-text {
+    display: none;
+  }
+  
+  .translate-button {
+    padding: 8px;
+  }
+}
+
+/* Estilos para esconder elementos indesejados do Google Translate */
+.goog-te-banner-frame,
+.goog-te-balloon-frame {
+  display: none !important;
+}
+
+.goog-te-menu-value:hover {
+  text-decoration: none !important;
+}
+
+body {
+  top: 0 !important;
+}
+
+/* Remover a barra superior do Google Translate */
+.skiptranslate,
+.goog-te-banner-frame {
+  display: none !important;
+}
+
+/* Ajustar o corpo da página quando o Google Translate estiver ativo */
+body.translated-ltr,
+.translated-ltr body {
+  top: 0 !important;
+}
+
+/* Esconder o ícone do Google Translate no canto inferior direito */
+.goog-te-gadget-icon {
+  display: none !important;
+}
+
+.goog-te-gadget-simple {
+  background-color: transparent !important;
+  border: none !important;
+  padding: 0 !important;
+  font-size: 0 !important;
+}
+
+/* Esconder o widget do Google Translate */
+.goog-te-gadget {
+  height: 0 !important;
+  overflow: hidden !important;
+  position: absolute !important;
+  visibility: hidden !important;
+}
+
+/* Corrigir problemas de layout após a tradução */
+html[lang="pt"] body,
+html[lang="pt-BR"] body {
+  top: 0 !important;
+}
+
+/* Esconder o popup de seleção de idioma */
+.goog-te-menu-frame {
+  box-shadow: none !important;
+  position: absolute !important;
+  visibility: hidden !important;
+  height: 0 !important;
+  overflow: hidden !important;
+  opacity: 0 !important;
+} 

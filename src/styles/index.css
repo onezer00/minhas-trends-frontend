@@ -12,6 +12,11 @@
 /* Importando estilos dos componentes comuns */
 @import '../components/common/PlatformIcon/styles.css';
 @import '../components/common/HighlightText/styles.css';
+@import '../components/common/TranslateButton/styles.css';
+@import '../components/common/DonateButton/styles.css';
+@import '../components/common/Logo/styles.css';
+@import '../components/common/Pagination/styles.css';
+@import '../components/search/SearchBar/styles.css';
 
 /* Importando estilos da aplicação */
 @import '../App.css'; 

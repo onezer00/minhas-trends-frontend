@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { X, Loader2, ChevronDown, ChevronUp } from 'lucide-react';
 import { PlatformIcon } from '../../common/PlatformIcon';
 import { Logo } from '../../common/Logo';
@@ -26,6 +26,7 @@ export function Sidebar({
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
   const [showAllCategories, setShowAllCategories] = useState(false);
+  const sidebarRef = useRef(null);
 
   useEffect(() => {
     const fetchCategories = async () => {
@@ -105,6 +106,55 @@ export function Sidebar({
     fetchCategories();
   }, []);
 
+  // Adicionar um efeito para prevenir o scroll do body quando o menu estiver aberto
+  useEffect(() => {
+    if (isMobile) {
+      if (showMobileMenu) {
+        // Prevenir scroll no body quando o menu estiver aberto
+        document.body.style.overflow = 'hidden';
+      } else {
+        // Restaurar scroll quando o menu estiver fechado
+        document.body.style.overflow = '';
+      }
+    }
+    
+    return () => {
+      // Garantir que o scroll seja restaurado quando o componente for desmontado
+      document.body.style.overflow = '';
+    };
+  }, [isMobile, showMobileMenu]);
+
+  // Adicionar suporte a gestos de swipe para fechar o menu
+  useEffect(() => {
+    if (!isMobile || !sidebarRef.current) return;
+    
+    let startX = 0;
+    let currentX = 0;
+    
+    const handleTouchStart = (e) => {
+      startX = e.touches[0].clientX;
+    };
+    
+    const handleTouchMove = (e) => {
+      if (!showMobileMenu) return;
+      currentX = e.touches[0].clientX;
+      
+      // Se o usuário estiver arrastando da esquerda para a direita (para fechar o menu)
+      if (currentX - startX < -50) {
+        onMobileMenuClose();
+      }
+    };
+    
+    const sidebarElement = sidebarRef.current;
+    sidebarElement.addEventListener('touchstart', handleTouchStart, { passive: true });
+    sidebarElement.addEventListener('touchmove', handleTouchMove, { passive: true });
+    
+    return () => {
+      sidebarElement.removeEventListener('touchstart', handleTouchStart);
+      sidebarElement.removeEventListener('touchmove', handleTouchMove);
+    };
+  }, [isMobile, showMobileMenu, onMobileMenuClose]);
+
   // Função para formatar o nome da categoria para exibição
   const formatCategoryName = (name) => {
     if (name === 'all') return 'Todas';
@@ -119,103 +169,111 @@ export function Sidebar({
     : categories.slice(0, 6); // Mostrar apenas as 6 primeiras categorias
 
   return (
-    <nav className={`sidebar ${showMobileMenu ? 'active' : ''} ${isMobile ? 'mobile' : ''}`}>
-      <div className="sidebar-content">
-        {isMobile && (
-          <div className="mobile-header">
-            <Logo size="md" />
-            <button 
-              onClick={onMobileMenuClose}
-              className="close-button"
-            >
-              <X size={20} />
-            </button>
-          </div>
-        )}
-        
-        <div className="sidebar-section platforms-section">
-          <h3 className="section-title">Plataformas</h3>
-          <ul className="sidebar-list platform-list">
-            {platforms.map(platform => (
-              <li key={platform.id}>
-                <button 
-                  onClick={() => !platform.disabled && onPlatformSelect(platform.id)}
-                  className={`sidebar-button platform-button ${selectedPlatform === platform.id ? 'active' : ''} ${platform.disabled ? 'disabled' : ''}`}
-                  disabled={platform.disabled}
-                >
-                  {platform.id !== 'all' && (
-                    <PlatformIcon platform={platform.id} />
-                  )}
-                  <span>{platform.name}</span>
-                  {platform.disabled && <span className="platform-status">(Em breve)</span>}
-                </button>
-              </li>
-            ))}
-          </ul>
-        </div>
-
-        <div className="sidebar-section categories-section">
-          <h3 className="section-title">Categorias</h3>
-          {loading ? (
-            <div className="loading-categories">
-              <Loader2 size={18} className="animate-spin" />
-              <span>Carregando categorias...</span>
-            </div>
-          ) : error ? (
-            <div className="categories-error">
-              <p>{error}</p>
-              <button 
-                onClick={() => window.location.reload()}
-                className="retry-button"
-              >
-                Tentar novamente
-              </button>
-            </div>
-          ) : (
-            <>
-              <ul className="sidebar-list category-list">
-                {visibleCategories.map(category => (
-                  <li key={category.name}>
-                    <button 
-                      onClick={() => onCategorySelect(category.name)}
-                      className={`sidebar-button category-button ${selectedCategory === category.name ? 'active' : ''}`}
-                    >
-                      <span>{formatCategoryName(category.name)}</span>
-                      <span className="category-count">{category.count}</span>
-                    </button>
-                  </li>
-                ))}
-              </ul>
-              
-              {categories.length > 6 && (
-                <button 
-                  className="show-more-button"
-                  onClick={() => setShowAllCategories(!showAllCategories)}
-                >
-                  {showAllCategories ? (
-                    <>
-                      <span>Mostrar menos</span>
-                      <ChevronUp size={16} />
-                    </>
-                  ) : (
-                    <>
-                      <span>Mostrar mais</span>
-                      <ChevronDown size={16} />
-                    </>
-                  )}
-                </button>
-              )}
-            </>
-          )}
-        </div>
-      </div>
-      
+    <>
+      {/* Renderizar o backdrop fora do sidebar para evitar problemas de sobreposição */}
       {isMobile && showMobileMenu && (
         <div 
           className="mobile-backdrop"
           onClick={onMobileMenuClose}
+          aria-hidden="true"
         />
       )}
-    </nav>
+      
+      <nav 
+        ref={sidebarRef}
+        className={`sidebar ${showMobileMenu ? 'active' : ''} ${isMobile ? 'mobile' : ''}`}
+      >
+        <div className="sidebar-content">
+          {isMobile && (
+            <div className="mobile-header">
+              <Logo size="md" />
+              <button 
+                onClick={onMobileMenuClose}
+                className="close-button"
+                aria-label="Fechar menu"
+              >
+                <X size={20} />
+              </button>
+            </div>
+          )}
+          
+          <div className="sidebar-section platforms-section">
+            <h3 className="section-title">Plataformas</h3>
+            <ul className="sidebar-list platform-list">
+              {platforms.map(platform => (
+                <li key={platform.id}>
+                  <button 
+                    onClick={() => !platform.disabled && onPlatformSelect(platform.id)}
+                    className={`sidebar-button platform-button ${selectedPlatform === platform.id ? 'active' : ''} ${platform.disabled ? 'disabled' : ''}`}
+                    disabled={platform.disabled}
+                  >
+                    {platform.id !== 'all' && (
+                      <PlatformIcon platform={platform.id} />
+                    )}
+                    <span>{platform.name}</span>
+                    {platform.disabled && <span className="platform-status">(Em breve)</span>}
+                  </button>
+                </li>
+              ))}
+            </ul>
+          </div>
+
+          <div className="sidebar-section categories-section">
+            <h3 className="section-title">Categorias</h3>
+            {loading ? (
+              <div className="loading-categories">
+                <Loader2 size={18} className="animate-spin" />
+                <span>Carregando categorias...</span>
+              </div>
+            ) : error ? (
+              <div className="categories-error">
+                <p>{error}</p>
+                <button 
+                  onClick={() => window.location.reload()}
+                  className="retry-button"
+                >
+                  Tentar novamente
+                </button>
+              </div>
+            ) : (
+              <>
+                <ul className="sidebar-list category-list">
+                  {visibleCategories.map(category => (
+                    <li key={category.name}>
+                      <button 
+                        onClick={() => onCategorySelect(category.name)}
+                        className={`sidebar-button category-button ${selectedCategory === category.name ? 'active' : ''}`}
+                      >
+                        <span>{formatCategoryName(category.name)}</span>
+                        <span className="category-count">{category.count}</span>
+                      </button>
+                    </li>
+                  ))}
+                </ul>
+                
+                {categories.length > 6 && (
+                  <button 
+                    className="show-more-button"
+                    onClick={() => setShowAllCategories(!showAllCategories)}
+                  >
+                    {showAllCategories ? (
+                      <>
+                        <span>Mostrar menos</span>
+                        <ChevronUp size={16} />
+                      </>
+                    ) : (
+                      <>
+                        <span>Mostrar mais</span>
+                        <ChevronDown size={16} />
+                      </>
+                    )}
+                  </button>
+                )}
+              </>
+            )}
+          </div>
+        </div>
+      </nav>
+    </>
   );
 } 

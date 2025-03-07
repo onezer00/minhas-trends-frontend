@@ -254,15 +254,27 @@
     left: 0;
     width: 100%;
     max-width: 320px;
-    z-index: var(--z-drawer);
+    z-index: 200; /* Aumentando o z-index para garantir que fique acima de tudo */
     transform: translateX(-100%);
     transition: transform var(--transition-base) var(--ease-in-out);
+    height: 100vh; /* Usar vh para garantir altura total da viewport */
+    overflow-y: auto;
+    box-shadow: 0 0 15px rgba(0, 0, 0, 0.1);
+    background-color: var(--color-white); /* Garantir que o fundo seja sólido */
+    display: flex;
+    flex-direction: column;
+  }
+
+  .dark .sidebar.mobile {
+    box-shadow: 0 0 15px rgba(0, 0, 0, 0.3);
+    background-color: var(--color-gray-800); /* Garantir que o fundo seja sólido no modo escuro */
   }
 
   .sidebar.mobile.active {
     transform: translateX(0);
   }
 
+  /* Colocando o backdrop como um elemento separado */
   .mobile-backdrop {
     position: fixed;
     top: 0;
@@ -270,8 +282,41 @@
     bottom: 0;
     left: 0;
     background-color: rgba(0, 0, 0, 0.5);
-    z-index: calc(var(--z-drawer) - 1);
-    backdrop-filter: blur(2px);
+    z-index: 150; /* Valor abaixo do sidebar */
+    touch-action: auto;
+    pointer-events: auto; /* Garantir que eventos de clique funcionem */
+  }
+  
+  /* Garantir que o conteúdo do sidebar esteja acima do backdrop */
+  .sidebar-content {
+    position: relative;
+    z-index: 201; /* Acima do sidebar e do backdrop */
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+    padding-bottom: 80px; /* Adicionar espaço extra no final para garantir que tudo seja visível */
+  }
+  
+  /* Garantir que os botões dentro do sidebar sejam clicáveis */
+  .sidebar-button,
+  .close-button,
+  .show-more-button {
+    position: relative;
+    z-index: 1;
+    -webkit-tap-highlight-color: rgba(0,0,0,0); /* Remover highlight em dispositivos móveis */
+    min-height: 44px; /* Tamanho mínimo recomendado para áreas tocáveis */
+  }
+  
+  /* Garantir que as listas sejam clicáveis */
+  .sidebar-list {
+    position: relative;
+    z-index: 1;
+  }
+  
+  /* Garantir que as seções sejam clicáveis */
+  .sidebar-section {
+    position: relative;
+    z-index: 1;
   }
 }
 
