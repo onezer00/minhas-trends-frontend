@@ -1,15 +1,15 @@
 {
   "files": {
-    "main.css": "/minhas-trends-frontend/static/css/main.0b4879e1.css",
-    "main.js": "/minhas-trends-frontend/static/js/main.f6a6108b.js",
+    "main.css": "/minhas-trends-frontend/static/css/main.4e717e5d.css",
+    "main.js": "/minhas-trends-frontend/static/js/main.fbcb3ece.js",
     "static/js/453.75f8dd8e.chunk.js": "/minhas-trends-frontend/static/js/453.75f8dd8e.chunk.js",
     "index.html": "/minhas-trends-frontend/index.html",
-    "main.0b4879e1.css.map": "/minhas-trends-frontend/static/css/main.0b4879e1.css.map",
-    "main.f6a6108b.js.map": "/minhas-trends-frontend/static/js/main.f6a6108b.js.map",
+    "main.4e717e5d.css.map": "/minhas-trends-frontend/static/css/main.4e717e5d.css.map",
+    "main.fbcb3ece.js.map": "/minhas-trends-frontend/static/js/main.fbcb3ece.js.map",
     "453.75f8dd8e.chunk.js.map": "/minhas-trends-frontend/static/js/453.75f8dd8e.chunk.js.map"
   },
   "entrypoints": [
-    "static/css/main.0b4879e1.css",
-    "static/js/main.f6a6108b.js"
+    "static/css/main.4e717e5d.css",
+    "static/js/main.fbcb3ece.js"
   ]
 }
